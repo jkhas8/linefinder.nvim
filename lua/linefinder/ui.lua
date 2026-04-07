@@ -207,6 +207,15 @@ function M.open()
     title_pos = "center",
   })
 
+  -- Disable completion plugins for this buffer
+  vim.b[state.input_buf].completion = false
+  -- blink.cmp
+  vim.b[state.input_buf].blink_cmp_enabled = false
+  -- nvim-cmp
+  pcall(function()
+    require("cmp").setup.buffer({ enabled = false })
+  end)
+
   -- Enter insert mode in the input window
   vim.cmd("startinsert")
 
