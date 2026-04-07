@@ -17,8 +17,9 @@ end
 --- Returns matched character positions (1-indexed) or nil if no match.
 --- @param text string
 --- @param query string
+--- @param used table|nil Set of byte positions already claimed by previous tokens
 --- @return table|nil Array of matched byte positions
-local function fuzzy_match(text, query)
+local function fuzzy_match(text, query, used)
   local positions = {}
   local lower_text = text:lower()
   local lower_query = query:lower()
@@ -27,7 +28,7 @@ local function fuzzy_match(text, query)
     local qchar = lower_query:sub(qi, qi)
     local found = false
     while ti <= #lower_text do
-      if lower_text:sub(ti, ti) == qchar then
+      if lower_text:sub(ti, ti) == qchar and not (used and used[ti]) then
         positions[#positions + 1] = ti
         ti = ti + 1
         found = true
@@ -100,17 +101,20 @@ local function multi_token_match(text, tokens)
   local all_positions = {}
   local total_score = 0
   local num_tokens = #tokens
+  local used = {} -- track byte positions already claimed by previous tokens
   for i, token in ipairs(tokens) do
-    local positions = fuzzy_match(text, token)
+    local positions = fuzzy_match(text, token, used)
     if not positions then
       return nil, 0
+    end
+    -- Mark matched positions as used so later tokens can't reuse them
+    for _, pos in ipairs(positions) do
+      used[pos] = true
+      all_positions[#all_positions + 1] = pos
     end
     -- Earlier tokens get higher weight: first token = num_tokens, last = 1
     local weight = num_tokens - i + 1
     total_score = total_score + fuzzy_score(positions) * weight
-    for _, pos in ipairs(positions) do
-      all_positions[#all_positions + 1] = pos
-    end
   end
   table.sort(all_positions)
   return all_positions, total_score
