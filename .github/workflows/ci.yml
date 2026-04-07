@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check lua/
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        neovim-version: ["v0.9.5", "v0.10.4", "stable"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: ${{ matrix.neovim-version }}
+      - name: Verify plugin loads
+        run: |
+          nvim --headless -u NONE --cmd "set rtp+=." -c "lua print(vim.inspect(require('linefinder')))" -c "q"
+      - name: Verify command exists
+        run: |
+          nvim --headless -u NONE --cmd "set rtp+=." -c "runtime plugin/linefinder.lua" -c "lua assert(vim.fn.exists(':LineFinder') == 2, 'LineFinder command not found')" -c "q"

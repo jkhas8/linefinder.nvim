@@ -1,0 +1,76 @@
+*linefinder.txt*  Search and jump to lines in the current buffer
+
+Author:   jkhas
+License:  MIT
+Requires: Neovim >= 0.7
+
+==============================================================================
+CONTENTS                                              *linefinder-contents*
+
+  1. Introduction ............................ |linefinder-introduction|
+  2. Usage ................................... |linefinder-usage|
+  3. Keymaps ................................. |linefinder-keymaps|
+  4. API ..................................... |linefinder-api|
+  5. Highlights .............................. |linefinder-highlights|
+
+==============================================================================
+1. INTRODUCTION                                   *linefinder-introduction*
+
+linefinder.nvim is a zero-dependency Neovim plugin for searching and jumping
+to lines in the current buffer. It provides fuzzy matching with multi-token
+search, smart scoring, and per-character highlighting in a floating window.
+
+==============================================================================
+2. USAGE                                                 *linefinder-usage*
+
+                                                              *:LineFinder*
+:LineFinder         Open the LineFinder floating window for the current
+                    buffer. Type to fuzzy-filter lines, select a result,
+                    and press <CR> to jump to that line.
+
+Search supports multiple tokens separated by spaces. Each token is matched
+independently in any order. For example, "fn open" matches lines containing
+both "fn" and "open" regardless of their order in the line.
+
+Exact substring matches are ranked above fuzzy matches. Earlier tokens in the
+query have higher priority in scoring.
+
+==============================================================================
+3. KEYMAPS                                             *linefinder-keymaps*
+
+The following keymaps are active inside the LineFinder window:
+
+  <CR>              Jump to the selected line and close
+  <Esc>             Close without jumping
+  <C-j> / <Down>    Move selection down
+  <C-k> / <Up>      Move selection up
+
+In normal mode, `j` and `k` also move the selection.
+
+==============================================================================
+4. API                                                     *linefinder-api*
+
+                                                       *linefinder.open()*
+linefinder.open()
+    Open the LineFinder window for the current buffer.
+
+                                                      *linefinder.setup()*
+linefinder.setup({opts})
+    Optional setup function. Reserved for future configuration.
+
+==============================================================================
+5. HIGHLIGHTS                                       *linefinder-highlights*
+
+The following highlight groups are used:
+
+  *LineFinderMatch*       Matched characters in results.
+                        Default: links to |hl-Search|
+
+  *LineFinderSelection*   Currently selected result line.
+                        Default: links to |hl-CursorLine|
+
+  *LineFinderBorder*      Floating window border.
+                        Default: links to |hl-FloatBorder|
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
