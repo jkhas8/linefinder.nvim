@@ -19,7 +19,7 @@ A fast, zero-dependency Neovim plugin for searching and jumping to lines in the 
 
 ```lua
 {
-  "your-username/linefinder.nvim",
+  "jkhas8/linefinder.nvim",
   keys = {
     { "<leader>fl", "<cmd>LineFinder<cr>", desc = "LineFinder" },
   },
