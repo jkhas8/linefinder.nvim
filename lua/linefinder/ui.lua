@@ -55,9 +55,9 @@ local function render_results()
     lines = { "  No matches" }
   end
 
-  vim.api.nvim_buf_set_option(state.results_buf, "modifiable", true)
+  vim.bo[state.results_buf].modifiable = true
   vim.api.nvim_buf_set_lines(state.results_buf, 0, -1, false, lines)
-  vim.api.nvim_buf_set_option(state.results_buf, "modifiable", false)
+  vim.bo[state.results_buf].modifiable = false
 
   -- Clear old highlights
   vim.api.nvim_buf_clear_namespace(state.results_buf, state.ns_id, 0, -1)
@@ -102,6 +102,7 @@ end
 
 --- Close the finder windows and clean up.
 local function close()
+  pcall(vim.cmd, "stopinsert")
   -- Delete autocmds
   pcall(vim.api.nvim_del_augroup_by_name, "LineFinder")
 
@@ -160,6 +161,9 @@ end
 
 --- Open the finder UI.
 function M.open()
+  if state.input_win and vim.api.nvim_win_is_valid(state.input_win) then
+    return
+  end
   setup_highlights()
 
   state.source_buf = vim.api.nvim_get_current_buf()
@@ -172,8 +176,8 @@ function M.open()
 
   -- Create results buffer and window (bottom)
   state.results_buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_option(state.results_buf, "bufhidden", "wipe")
-  vim.api.nvim_buf_set_option(state.results_buf, "modifiable", false)
+  vim.bo[state.results_buf].bufhidden = "wipe"
+  vim.bo[state.results_buf].modifiable = false
 
   state.results_win = vim.api.nvim_open_win(state.results_buf, false, {
     relative = "editor",
@@ -184,12 +188,12 @@ function M.open()
     style = "minimal",
     border = "rounded",
   })
-  vim.api.nvim_win_set_option(state.results_win, "cursorline", false)
+  vim.wo[state.results_win].cursorline = false
 
   -- Create input buffer and window (top)
   state.input_buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_option(state.input_buf, "bufhidden", "wipe")
-  vim.api.nvim_buf_set_option(state.input_buf, "buftype", "nofile")
+  vim.bo[state.input_buf].bufhidden = "wipe"
+  vim.bo[state.input_buf].buftype = "nofile"
 
   state.input_win = vim.api.nvim_open_win(state.input_buf, true, {
     relative = "editor",
