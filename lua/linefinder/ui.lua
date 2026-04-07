@@ -47,6 +47,9 @@ end
 
 --- Render the filtered results into the results buffer.
 local function render_results()
+  if not state.results_buf or not vim.api.nvim_buf_is_valid(state.results_buf) then
+    return
+  end
   local lines = {}
   for _, entry in ipairs(state.filtered) do
     lines[#lines + 1] = string.format("%4d: %s", entry.lnum, entry.text)
@@ -102,6 +105,9 @@ end
 
 --- Close the finder windows and clean up.
 local function close()
+  if state.input_buf == nil and state.results_buf == nil then
+    return
+  end
   pcall(vim.cmd, "stopinsert")
   -- Delete autocmds
   pcall(vim.api.nvim_del_augroup_by_name, "LineFinder")
