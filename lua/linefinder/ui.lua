@@ -84,14 +84,7 @@ local function render_results()
 
   -- Highlight selected line
   if #state.filtered > 0 and state.selected >= 1 and state.selected <= #state.filtered then
-    vim.api.nvim_buf_add_highlight(
-      state.results_buf,
-      state.ns_id,
-      "LineFinderSelection",
-      state.selected - 1,
-      0,
-      -1
-    )
+    vim.api.nvim_buf_add_highlight(state.results_buf, state.ns_id, "LineFinderSelection", state.selected - 1, 0, -1)
   end
 end
 
@@ -243,15 +236,27 @@ function M.open()
 
   vim.keymap.set("i", "<CR>", accept, opts)
   vim.keymap.set("i", "<Esc>", close, opts)
-  vim.keymap.set("i", "<C-j>", function() move_selection(1) end, opts)
-  vim.keymap.set("i", "<C-k>", function() move_selection(-1) end, opts)
-  vim.keymap.set("i", "<Down>", function() move_selection(1) end, opts)
-  vim.keymap.set("i", "<Up>", function() move_selection(-1) end, opts)
+  vim.keymap.set("i", "<C-j>", function()
+    move_selection(1)
+  end, opts)
+  vim.keymap.set("i", "<C-k>", function()
+    move_selection(-1)
+  end, opts)
+  vim.keymap.set("i", "<Down>", function()
+    move_selection(1)
+  end, opts)
+  vim.keymap.set("i", "<Up>", function()
+    move_selection(-1)
+  end, opts)
   -- Normal mode mappings in case user exits insert mode
   vim.keymap.set("n", "<CR>", accept, opts)
   vim.keymap.set("n", "<Esc>", close, opts)
-  vim.keymap.set("n", "j", function() move_selection(1) end, opts)
-  vim.keymap.set("n", "k", function() move_selection(-1) end, opts)
+  vim.keymap.set("n", "j", function()
+    move_selection(1)
+  end, opts)
+  vim.keymap.set("n", "k", function()
+    move_selection(-1)
+  end, opts)
 end
 
 return M
