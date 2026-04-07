@@ -65,19 +65,20 @@ local function render_results()
   -- Clear old highlights
   vim.api.nvim_buf_clear_namespace(state.results_buf, state.ns_id, 0, -1)
 
-  -- Highlight matched substrings
-  -- The prefix is "%4d: " which is 6 chars (4 digits + colon + space)
-  for i, pos in ipairs(state.positions) do
+  -- Highlight each matched character individually (fuzzy match positions)
+  for i, positions in ipairs(state.positions) do
     if i <= #state.filtered then
       local prefix_len = #string.format("%4d: ", state.filtered[i].lnum)
-      vim.api.nvim_buf_add_highlight(
-        state.results_buf,
-        state.ns_id,
-        "LineFinderMatch",
-        i - 1,
-        prefix_len + pos.start - 1,
-        prefix_len + pos.finish
-      )
+      for _, pos in ipairs(positions) do
+        vim.api.nvim_buf_add_highlight(
+          state.results_buf,
+          state.ns_id,
+          "LineFinderMatch",
+          i - 1,
+          prefix_len + pos - 1,
+          prefix_len + pos
+        )
+      end
     end
   end
 
